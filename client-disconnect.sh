@@ -4,9 +4,9 @@
 # vim: softtabstop=4 shiftwidth=4 expandtab fenc=utf-8 spell spelllang=en cc=120
 #======================================================================================================================
 #
-#          FILE: client-connect.sh
+#          FILE: client-disconnect.sh
 #
-#   DESCRIPTION: Shell executable used during client connect; parameters passed to openvpn.php
+#   DESCRIPTION: Shell executable used during client disconnect; parameters passed to openvpn.php
 #
 #          BUGS: https://github.com/helin24/openvpn-php-access/issues
 #
