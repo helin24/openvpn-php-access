@@ -37,8 +37,3 @@
     - Invoker is connection manager, which takes command and passes it to executors
     - Two receivers - iptables generator and the class that puts routes into a file
         - Both have an execute method that uses address/rule object but does different things with it
-
-
-### Questions
-- iptables commands and what happens in line 16 of netfilter_openvpn.sh [link](http://www.howtogeek.com/177621/the-beginners-guide-to-iptables-the-linux-firewall/)
-    - does iptables assume all ports if no port specified

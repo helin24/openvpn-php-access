@@ -1,10 +1,11 @@
 <?php
 require_once('models/ConnectionManager.php');
 
-list($script, $action, $user) = $argv;
+list($script, $tempfile, $action, $user) = $argv;
 // $argv[0] is script location
-// $argv[1] is action of connect or disconnect
-// $argv[2] is user's identifier
+// $argv[1] is location of tempfile with environment variables from time of connection
+// $argv[2] is action of connect or disconnect
+// $argv[3] is user's identifier
 
 $connectionManager = new ConnectionManager($user);
 

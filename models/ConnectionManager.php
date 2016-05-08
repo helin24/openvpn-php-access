@@ -16,7 +16,7 @@ class ConnectionManager {
         $rules = LDAP::obtain()->getUserRules($this->user);
 
         // Pass rules object to iptables
-        IptablesManager::obtain()->createRules($this->user, $rules);
+        IptablesManager::createRules($this->user, $rules);
 
         // Pass rules object to routes file generator
         RoutesWriter::obtain()->writeToFile($rules);
@@ -24,6 +24,6 @@ class ConnectionManager {
 
     public function disconnect() {
 
-        IptablesManager::obtain()->deleteRules($userAddress);
+        IptablesManager::deleteRules($userAddress);
     }
 }
