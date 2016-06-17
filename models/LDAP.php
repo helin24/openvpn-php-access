@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../config.php');
+require_once(__DIR__ . '/Address.php');
 
 class LDAP {
 
@@ -24,7 +25,6 @@ class LDAP {
         $individualRules = $this->getIndividualRules($user);
 
         $rules = array_merge($groupRules, $individualRules);
-        var_dump($rules);
         return $this->consolidateRules($rules);
     }
 
@@ -32,7 +32,6 @@ class LDAP {
         if (is_null($this->connection) || is_null($this->bind)) {
             
             $this->cr = $this->getCredentials();
-
             $this->connection = ldap_connect($this->cr["address"], $this->cr["port"]);
             $this->bind = ldap_bind($this->connection, $this->cr["bind"], $this->cr["bindPassword"]);
         }
@@ -105,19 +104,42 @@ class LDAP {
     }
 
     protected function consolidateRules($rulesArray) {
-        $uniqueRules = array_unique($rulesArray);
-
         $addresses = [];
-        foreach ($uniqueRules as $ruleDN) {
-            $addresses[] = $this->getNetwork($ruleDN);
+        foreach ($rulesArray as $ruleDN => $v) {
+            $addresses = array_merge($addresses, $this->getNetwork($ruleDN));
         }
-
+        
         return $addresses;
     }
 
     protected function getNetwork($ruleDN) {
         $this->connect();
-        // Retrieve information from LDAP
-        // Make new address object
+
+        list($filter, $base) = explode(',', $ruleDN, 2);
+
+        $ipResource = ldap_list($this->connection, $base, $filter, ["ipnetworknumber", "ipnetmasknumber"]);
+        $ipResults = ldap_get_entries($this->connection, $ipResource);
+
+        $ip = $ipResults[0]["ipnetworknumber"][0];
+        $netmask = $ipResults[0]["ipnetmasknumber"][0];
+
+        $protocolResource = ldap_list($this->connection, $ruleDN, "cn=*", ["ipserviceport", "ipserviceprotocol"], 0);
+        $protocolResults = ldap_get_entries($this->connection, $protocolResource);
+
+        $addresses = [];
+        foreach ($protocolResults as $key => $result) {
+            if ($key === "count") {
+                continue;
+            }
+
+            $address = new Address($ruleDN);
+            $address->ip = $ip;
+            $address->netmask = $netmask;
+            $address->protocol = $result["ipserviceprotocol"][0];
+            $address->port = $result["ipserviceport"][0];
+
+            $addresses[] = $address;
+        }
+        return $addresses;
     }
 }
