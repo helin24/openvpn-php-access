@@ -1,5 +1,4 @@
 # openvpn-php-access
-Once before the Ides of March
 
 ### Plan
 - Client Connects
