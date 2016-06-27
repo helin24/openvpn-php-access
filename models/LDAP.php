@@ -1,5 +1,6 @@
 <?php
-require_once(__DIR__ . '/../config.php');
+require_once('/etc/openvpn/openvpn-php-access/config.php');
+// require_once(__DIR__ . '/../config.php');
 require_once(__DIR__ . '/Address.php');
 
 class LDAP {

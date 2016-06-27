@@ -14,6 +14,7 @@ class ConnectionManager {
     public function connect() {
         // Get rules from LDAP
         $rules = LDAP::obtain()->getUserRules($this->user);
+	print_r($rules, false); die;
 
         // Pass rules object to iptables
         IptablesManager::createRules($this->user, $rules);
