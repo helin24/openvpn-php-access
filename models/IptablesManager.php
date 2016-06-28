@@ -12,10 +12,11 @@ class IptablesManager {
     }
 
     public static function deleteRules($userAddress) {
-        // find all forward rules from table
-        $rules = exec('sudo iptables -L FORWARD');
+        // get all POSTROUTING rules
+        $rules = exec('sudo iptables --table nat -L POSTROUTING');
+        var_dump($rules);
 
-        // find indices of rules with userAddress
+        // find indices of rules related to user
         $userRuleIndices = [];
 
         for ($index = 1; $index <= count($rules); $index++) {
@@ -24,10 +25,14 @@ class IptablesManager {
             }
         }
 
-        // drop user's rules from table
+        // drop user's rules from POSTROUTING
         foreach (array_reverse($userRuleIndices) as $index) {
-            exec('sudo iptables -D FORWARD ' . $index);
+            exec('sudo iptables --table nat -D POSTROUTING ' . $index);
         }
+
+        // flush and delete the user's chain
+        exec('sudo iptables --table nat --flush ' . $userAddress);
+        exec('sudo iptables --table nat --delete-chain ' . $userAddress);
     }
 
     public static function createRules($userAddress, $accessibleAddresses) {
@@ -35,13 +40,19 @@ class IptablesManager {
         self::deleteRules($userAddress);
         self::setLastForwardIndex();
 
-        var_dump($userAddress);
+        // Create the user's chain
+        exec('sudo iptables --table nat --new-chain ' . $userAddress);
+
+        // Add rule in POSTROUTING to use individual chain
         foreach ($accessibleAddresses as $destination) {
-            $stmt = 'sudo iptables -I FORWARD ' . $insertIndex 
-                . ' -i ' . SERVER_INTERFACE
-                . ' -s ' . $userAddress
-                . ' -d ' . $destination
-                . '-j ACCEPT';
+            $stmt = 'sudo iptables --table nat --insert ' . $userAddress 
+                . ' ' . $insertIndex 
+                . ' --out-interface ' . SERVER_INTERFACE
+                . ' --source ' . $userAddress . '/32'
+                . ' --destination ' . $destination->ip . '/' . $destination->netmask
+                . ' --dport ' . $destination->port
+                . ' --protocol ' . $destination->protocol
+                . ' --jump MASQUERADE';
             exec($stmt);
         }
     }

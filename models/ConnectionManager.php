@@ -6,17 +6,17 @@ require_once('RoutesWriter.php');
 class ConnectionManager {
 
     public $user;
-	public $userIP;
+    public $userIP;
 
-    public function __construct($user, $userIP){
+    public function __construct($user, $userIP) {
         $this->user = $user;
-	$this->userIP = $userIP;
+       $this->userIP = $userIP;
     }
 
     public function connect() {
         // Get rules from LDAP
         $rules = LDAP::obtain()->getUserRules($this->user);
-	print_r($rules, false);
+        print_r($rules, false);
 
         // Pass rules object to iptables
         IptablesManager::createRules($this->userIP, $rules);

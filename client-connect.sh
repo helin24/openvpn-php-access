@@ -27,4 +27,4 @@ if [[ -z "${PHPCLI}" || "${PHPCLI}" = "" ]]; then echo "ERROR: PHP NOT INSTALLED
 if [[ -z "${SUDO}" || "${SUDO}" = ""  ]]; then echo "ERROR: SUDO NOT FOUND" && exit 1 ; fi
 
 ## Black magic
-${SUDO} -E ${PHPCLI} $(pwd)/openvpn-php-access/openvpn.php ${USERTEMPFILE} connect ${username} ${ifconfig_pool_remote_ip} 
+${SUDO} -E ${PHPCLI} $(pwd)/openvpn-php-access/openvpn.php ${USERTEMPFILE} connect ${username} ${ifconfig_pool_remote_ip} ${proto_1} ${dev}
