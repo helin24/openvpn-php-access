@@ -1,16 +1,22 @@
 <?php
 require_once('models/ConnectionManager.php');
 
-list($script, $tempfile, $action, $user) = $argv;
+list($script, $tempfile, $action, $user, $userIP) = $argv;
 // $argv[0] is script location
 // $argv[1] is location of user tempfile that will be sent back to client
 // $argv[2] is action of connect or disconnect
 // $argv[3] is user's identifier
 
-$connectionManager = new ConnectionManager($user);
+$connectionManager = new ConnectionManager($user, $userIP);
 
 if ($action == 'connect') {
-    $connectionManager->connect();
+	try {
+		$connectionManager->connect();
+	}
+	catch (\Exception $ex) {
+		file_put_contents($tempfile, "disable");
+		throw $ex;
+	}
 } 
 elseif ($action == 'disconnect') {
     $connectionManager->disconnect();

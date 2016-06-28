@@ -26,6 +26,9 @@ class LDAP {
         $individualRules = $this->getIndividualRules($user);
 
         $rules = array_merge($groupRules, $individualRules);
+	if (empty($rules)) {
+		throw new \Exception("User $user has no access permissions");
+	}
         return $this->consolidateRules($rules);
     }
 
@@ -91,8 +94,9 @@ class LDAP {
         $result = ldap_get_entries($this->connection, $resultResource);
 
         $accessRules = [];
-        if ($result["count"]) {
-
+	// If $result["count"] is 0, it means no users were returned.
+	// If accessto does not exist as a key, it means the user does not have individual rules
+        if ($result["count"] && array_key_exists("accessto", $result[0])) {
             foreach ($result[0]["accessto"] as $key => $accessPoint) {
                 if ($key !== "count") {
                     $accessRules[$accessPoint] = 1;
@@ -101,7 +105,6 @@ class LDAP {
         }
 
         return $accessRules;
-        // Or potentially return false if user not found?
     }
 
     protected function consolidateRules($rulesArray) {
