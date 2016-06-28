@@ -28,13 +28,13 @@ class IptablesManager {
 
         if (count($userRuleIndices) > 0) {
         // drop user's rules from POSTROUTING
-             foreach (array_reverse($userRuleIndices) as $index) {
-                 exec('sudo iptables --table nat -D POSTROUTING ' . $index);
-             }
+            foreach (array_reverse($userRuleIndices) as $index) {
+                exec('sudo iptables --table nat -D POSTROUTING ' . $index);
+            }
     
-             // flush and delete the user's chain
-             exec('sudo iptables --table nat --flush ' . $userAddress);
-             exec('sudo iptables --table nat --delete-chain ' . $userAddress);
+            // flush and delete the user's chain
+            exec('sudo iptables --table nat --flush ' . $userAddress);
+            exec('sudo iptables --table nat --delete-chain ' . $userAddress);
         }
     }
 
@@ -47,16 +47,21 @@ class IptablesManager {
         exec('sudo iptables --table nat --new-chain ' . $userAddress);
         exec('sudo iptables --table nat --append POSTROUTING --source ' . $userAddress . '/32 --jump ' . $userAddress);
 
+        // Could be missing protocol and dport if a general rule
         // Add rule in POSTROUTING to use individual chain
         foreach ($accessibleAddresses as $destination) {
             $stmt = 'sudo iptables --table nat --insert ' . $userAddress 
                 . ' ' . self::$insertIndex 
                 . ' --out-interface ' . SERVER_INTERFACE
                 . ' --source ' . $userAddress . '/32'
-                . ' --destination ' . $destination->ip . '/' . $destination->netmask
-                . ' --protocol ' . $destination->protocol
-                . ' --destination-port ' . $destination->port
-                . ' --jump MASQUERADE';
+                . ' --destination ' . $destination->ip . '/' . $destination->netmask;
+
+            if ($destination->protocol) {
+                $stmt .= ' --protocol ' . $destination->protocol
+                . ' --destination-port ' . $destination->port;
+            }
+
+            $stmt .= ' --jump MASQUERADE';
             exec($stmt);
         }
     }

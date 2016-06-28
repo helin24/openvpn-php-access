@@ -26,9 +26,9 @@ class LDAP {
         $individualRules = $this->getIndividualRules($user);
 
         $rules = array_merge($groupRules, $individualRules);
-	if (empty($rules)) {
-		throw new \Exception("User $user has no access permissions");
-	}
+        if (empty($rules)) {
+            throw new \Exception("User $user has no access permissions");
+        }
         return $this->consolidateRules($rules);
     }
 
@@ -94,8 +94,8 @@ class LDAP {
         $result = ldap_get_entries($this->connection, $resultResource);
 
         $accessRules = [];
-	// If $result["count"] is 0, it means no users were returned.
-	// If accessto does not exist as a key, it means the user does not have individual rules
+    // If $result["count"] is 0, it means no users were returned.
+    // If accessto does not exist as a key, it means the user does not have individual rules
         if ($result["count"] && array_key_exists("accessto", $result[0])) {
             foreach ($result[0]["accessto"] as $key => $accessPoint) {
                 if ($key !== "count") {
@@ -131,19 +131,29 @@ class LDAP {
         $protocolResults = ldap_get_entries($this->connection, $protocolResource);
 
         $addresses = [];
-        foreach ($protocolResults as $key => $result) {
-            if ($key === "count") {
-                continue;
-            }
+        if ($protocolResults["count"] > 0) {
+            foreach ($protocolResults as $key => $result) {
+                if ($key === "count") {
+                    continue;
+                }
 
+                $address = new Address($ruleDN);
+                $address->ip = $ip;
+                $address->netmask = $netmask;
+                $address->protocol = $result["ipserviceprotocol"][0];
+                $address->port = $result["ipserviceport"][0];
+
+                $addresses[] = $address;
+            }
+        }
+        else {
             $address = new Address($ruleDN);
             $address->ip = $ip;
             $address->netmask = $netmask;
-            $address->protocol = $result["ipserviceprotocol"][0];
-            $address->port = $result["ipserviceport"][0];
 
             $addresses[] = $address;
         }
+
         return $addresses;
     }
 }
