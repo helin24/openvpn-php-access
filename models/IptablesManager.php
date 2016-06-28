@@ -13,14 +13,15 @@ class IptablesManager {
 
     public static function deleteRules($userAddress) {
         // get all POSTROUTING rules
-        $rules = exec('sudo iptables --table nat -L POSTROUTING');
-        var_dump($rules);
+	$rules = [];
+        exec('sudo iptables --table nat -L POSTROUTING', $rules);
+	$rules = array_slice($rules, 2, count($rules) - 2);
 
         // find indices of rules related to user
         $userRuleIndices = [];
 
         for ($index = 1; $index <= count($rules); $index++) {
-            if (mb_strpos($rules[$index], $userAddress)) {
+            if (is_numeric(mb_strpos($rules[$index - 1], $userAddress))) {
                 $userRuleIndices[] = $index;
             }
         }
@@ -40,18 +41,19 @@ class IptablesManager {
         self::deleteRules($userAddress);
         self::setLastForwardIndex();
 
-        // Create the user's chain
+        // Create the user's chaiu
         exec('sudo iptables --table nat --new-chain ' . $userAddress);
+	exec('sudo iptables --table nat --append POSTROUTING --source ' . $userAddress . '/32 --jump ' . $userAddress);
 
         // Add rule in POSTROUTING to use individual chain
         foreach ($accessibleAddresses as $destination) {
             $stmt = 'sudo iptables --table nat --insert ' . $userAddress 
-                . ' ' . $insertIndex 
+                . ' ' . self::$insertIndex 
                 . ' --out-interface ' . SERVER_INTERFACE
                 . ' --source ' . $userAddress . '/32'
                 . ' --destination ' . $destination->ip . '/' . $destination->netmask
-                . ' --dport ' . $destination->port
                 . ' --protocol ' . $destination->protocol
+                . ' --destination-port ' . $destination->port
                 . ' --jump MASQUERADE';
             exec($stmt);
         }
