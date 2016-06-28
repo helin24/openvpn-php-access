@@ -13,9 +13,9 @@ class IptablesManager {
 
     public static function deleteRules($userAddress) {
         // get all POSTROUTING rules
-	$rules = [];
+        $rules = [];
         exec('sudo iptables --table nat -L POSTROUTING', $rules);
-	$rules = array_slice($rules, 2, count($rules) - 2);
+        $rules = array_slice($rules, 2, count($rules) - 2);
 
         // find indices of rules related to user
         $userRuleIndices = [];
@@ -26,14 +26,16 @@ class IptablesManager {
             }
         }
 
+        if (count($userRuleIndices) > 0) {
         // drop user's rules from POSTROUTING
-        foreach (array_reverse($userRuleIndices) as $index) {
-            exec('sudo iptables --table nat -D POSTROUTING ' . $index);
+             foreach (array_reverse($userRuleIndices) as $index) {
+                 exec('sudo iptables --table nat -D POSTROUTING ' . $index);
+             }
+    
+             // flush and delete the user's chain
+             exec('sudo iptables --table nat --flush ' . $userAddress);
+             exec('sudo iptables --table nat --delete-chain ' . $userAddress);
         }
-
-        // flush and delete the user's chain
-        exec('sudo iptables --table nat --flush ' . $userAddress);
-        exec('sudo iptables --table nat --delete-chain ' . $userAddress);
     }
 
     public static function createRules($userAddress, $accessibleAddresses) {
@@ -41,9 +43,9 @@ class IptablesManager {
         self::deleteRules($userAddress);
         self::setLastForwardIndex();
 
-        // Create the user's chaiu
+        // Create the user's chain
         exec('sudo iptables --table nat --new-chain ' . $userAddress);
-	exec('sudo iptables --table nat --append POSTROUTING --source ' . $userAddress . '/32 --jump ' . $userAddress);
+        exec('sudo iptables --table nat --append POSTROUTING --source ' . $userAddress . '/32 --jump ' . $userAddress);
 
         // Add rule in POSTROUTING to use individual chain
         foreach ($accessibleAddresses as $destination) {
