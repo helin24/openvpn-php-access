@@ -36,7 +36,7 @@ class IptablesManager {
         foreach ($accessibleAddresses as $destination) {
             $stmt = 'sudo iptables --table nat --insert ' . $this->userAddress 
                 . ' ' . $this->insertIndex 
-                . ' --in-interface ' . $this->inInterface
+//                . ' --in-interface ' . $this->inInterface
                 . ' --out-interface ' . SERVER_INTERFACE
                 . ' --source ' . $this->userAddress . '/32'
                 . ' --destination ' . $destination->ip . '/' . $destination->netmask;

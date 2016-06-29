@@ -10,16 +10,16 @@ list($script, $tempfile, $action, $user, $userIP, $proto, $dev) = $argv;
 // $argv[5] is protocol
 // $argv[6] is interface
 
-$connectionManager = new ConnectionManager($user, $userIP, $dev);
+$connectionManager = new ConnectionManager($user, $userIP, $dev, $tempfile);
 
 if ($action == 'connect') {
-	try {
-		$connectionManager->connect();
-	}
-	catch (\Exception $ex) {
-		file_put_contents($tempfile, "disable");
-		throw $ex;
-	}
+    try {
+        $connectionManager->connect();
+    }
+    catch (\Exception $ex) {
+    	file_put_contents($tempfile, "disable");
+    	throw $ex;
+    }
 } 
 elseif ($action == 'disconnect') {
     $connectionManager->disconnect();

@@ -7,13 +7,12 @@ class ConnectionManager {
 
     public $user;
     public $userIP;
-    public $inInterface;
 
-    public function __construct($user, $userIP, $inInterface) {
+    public function __construct($user, $userIP, $inInterface, $file) {
         $this->user = $user;
         $this->userIP = $userIP;
-        $this->inInterface = $inInterface;
         $this->iptables = new IptablesManager($user, $userIP, $inInterface);
+	$this->routesWriter = new RoutesWriter($file);
     }
 
     public function connect() {
@@ -24,11 +23,10 @@ class ConnectionManager {
         $this->iptables->createRules($rules);
 
         // Pass rules object to routes file generator
-        RoutesWriter::obtain()->writeToFile($rules);
+	$this->routesWriter->writeToFile($rules);
     }
 
     public function disconnect() {
-
-        IptablesManager::deleteRules($userAddress);
+	$this->iptables->deleteRules();
     }
 }

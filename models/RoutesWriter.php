@@ -2,34 +2,21 @@
 
 class RoutesWriter {
     
-    private static $routesWriter = null;
     protected $filename;
 
-    protected function __construct() {
-        // singleton class
-    }
-
-    public static function obtain() {
-        if (is_null(self::$routesWriter)) {
-            self::$routesWriter = new RoutesWriter();
-        }
-        return self::$routesWriter;
+    public function __construct($filename) {
+	$this->filename = $filename;
     }
 
     public function writeToFile($accessibleAddresses) {
         // open file
+	$file = fopen($this->filename, 'w');
         
         foreach ($accessibleAddresses as $address) {
-            $this->translateToNetmask($address);
-
-            // then write to a file
+            $netmask = $address->getDecimalNetmask();
+            fwrite($file, "push \"route $address->ip $netmask\"\n");
         }
 
-        // direct non-internal traffic outside of VPN
-        // Push file to user (included in address objects)
-    }
-
-    protected function translateToNetmask($address) {
-        // change CIDR notation to netmask
+        return fclose($file);
     }
 }
