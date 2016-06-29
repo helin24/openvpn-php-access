@@ -6,10 +6,12 @@ class IptablesManager {
     private $insertIndex = 1;
     protected $user;
     protected $userAddress;
+    protected $inInterface;
 
-    public function __construct($user, $userAddress) {
+    public function __construct($user, $userAddress, $inInterface) {
         $this->user = $user;
         $this->userAddress = $userAddress;
+        $this->inInterface = $inInterface;
     }
 
     public function deleteRules() {
@@ -34,6 +36,7 @@ class IptablesManager {
         foreach ($accessibleAddresses as $destination) {
             $stmt = 'sudo iptables --table nat --insert ' . $this->userAddress 
                 . ' ' . $this->insertIndex 
+                . ' --in-interface ' . $this->inInterface
                 . ' --out-interface ' . SERVER_INTERFACE
                 . ' --source ' . $this->userAddress . '/32'
                 . ' --destination ' . $destination->ip . '/' . $destination->netmask;

@@ -10,7 +10,7 @@ list($script, $tempfile, $action, $user, $userIP, $proto, $dev) = $argv;
 // $argv[5] is protocol
 // $argv[6] is interface
 
-$connectionManager = new ConnectionManager($user, $userIP);
+$connectionManager = new ConnectionManager($user, $userIP, $dev);
 
 if ($action == 'connect') {
 	try {
