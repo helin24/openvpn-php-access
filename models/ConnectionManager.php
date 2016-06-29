@@ -10,7 +10,8 @@ class ConnectionManager {
 
     public function __construct($user, $userIP) {
         $this->user = $user;
-       $this->userIP = $userIP;
+        $this->userIP = $userIP;
+        $this->iptables = new IptablesManager($user, $userIP);
     }
 
     public function connect() {
@@ -18,7 +19,7 @@ class ConnectionManager {
         $rules = LDAP::obtain()->getUserRules($this->user);
 
         // Pass rules object to iptables
-        IptablesManager::createRules($this->userIP, $rules);
+        $this->iptables->createRules($rules);
 
         // Pass rules object to routes file generator
         RoutesWriter::obtain()->writeToFile($rules);

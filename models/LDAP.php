@@ -14,6 +14,10 @@ class LDAP {
         // singleton class
     }
 
+    /**
+     * Create LDAP connection
+     * @return Object LDAP
+     */
     public static function obtain() {
         if (is_null(self::$ldap)) {
             self::$ldap = new LDAP();
@@ -21,6 +25,11 @@ class LDAP {
         return self::$ldap;
     }
 
+    /**
+     * Return addresses that a user can access
+     * @param  String $user LDAP username
+     * @return Object Address
+     */
     public function getUserRules($user) {
         $groupRules = $this->getGroupRules($user);
         $individualRules = $this->getIndividualRules($user);
@@ -32,6 +41,10 @@ class LDAP {
         return $this->consolidateRules($rules);
     }
 
+    /**
+     * Connect to LDAP server
+     * @return null
+     */
     protected function connect() {
         if (is_null($this->connection) || is_null($this->bind)) {
             
@@ -42,6 +55,10 @@ class LDAP {
 
     }
 
+    /**
+     * Return credentials for LDAP connection
+     * @return Array 
+     */
     protected function getCredentials() {
         return [
             "address" => LDAP_ADDRESS,

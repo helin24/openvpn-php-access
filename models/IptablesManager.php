@@ -3,57 +3,44 @@ require_once(__DIR__ . '/../config.php');
 
 class IptablesManager {
 
-    private static $iptables = null;
-    private static $insertIndex = 1;
+    private $insertIndex = 1;
+    protected $user;
+    protected $userAddress;
 
-    public static function setLastForwardIndex() {
-        // find what index to put new forward rules in? If we use a drop statement at the very bottom of the rules and don't want all new statements to go in at the top?
-        self::$insertIndex = 1;
+    public function __construct($user, $userAddress) {
+        $this->user = $user;
+        $this->userAddress = $userAddress;
     }
 
-    public static function deleteRules($userAddress) {
-        // get all POSTROUTING rules
-        $rules = [];
-        exec('sudo iptables --table nat -L POSTROUTING', $rules);
-        $rules = array_slice($rules, 2, count($rules) - 2);
-
-        // find indices of rules related to user
-        $userRuleIndices = [];
-
-        for ($index = 1; $index <= count($rules); $index++) {
-            if (is_numeric(mb_strpos($rules[$index - 1], $userAddress))) {
-                $userRuleIndices[] = $index;
-            }
-        }
-
-        if (count($userRuleIndices) > 0) {
+    public function deleteRules() {
         // drop user's rules from POSTROUTING
-            foreach (array_reverse($userRuleIndices) as $index) {
-                exec('sudo iptables --table nat -D POSTROUTING ' . $index);
-            }
-    
-            // flush and delete the user's chain
-            exec('sudo iptables --table nat --flush ' . $userAddress);
-            exec('sudo iptables --table nat --delete-chain ' . $userAddress);
-        }
+        exec('sudo iptables --table nat -D' . $this->getPostroutingString($this->userAddress));
+
+        // flush and delete the user's chain
+        exec('sudo iptables --table nat --flush ' . $this->userAddress);
+        exec('sudo iptables --table nat --delete-chain ' . $this->userAddress);
     }
 
-    public static function createRules($userAddress, $accessibleAddresses) {
+    public function createRules($accessibleAddresses) {
         // first drop all user's rules
-        self::deleteRules($userAddress);
-        self::setLastForwardIndex();
+        $this->deleteRules();
 
         // Create the user's chain
-        exec('sudo iptables --table nat --new-chain ' . $userAddress);
-        exec('sudo iptables --table nat --append POSTROUTING --source ' . $userAddress . '/32 --jump ' . $userAddress);
+        exec('sudo iptables --table nat --new-chain ' . $this->userAddress);
+        exec('sudo iptables --table nat --append ' . $this->getPostroutingString());
+
+        // Additional default rules for user's chain
+        exec('sudo iptables --table nat --insert ' . $this->userAddress . "--match conntrack --ctstate ESTABLISHED --jump ACCEPT" . $this->getUserComment());
+        exec('sudo itables --table nat --append ' . $this->userAddress . '--jump LOG --log-prefix DROP ' . $this->userAddress . $this->getUserComment());
+        exec('iptables --table nat --append ' . $this->userAddress . ' --jump DROP' . $this->getUserComment());
 
         // Could be missing protocol and dport if a general rule
         // Add rule in POSTROUTING to use individual chain
         foreach ($accessibleAddresses as $destination) {
-            $stmt = 'sudo iptables --table nat --insert ' . $userAddress 
-                . ' ' . self::$insertIndex 
+            $stmt = 'sudo iptables --table nat --insert ' . $this->userAddress 
+                . ' ' . $this->insertIndex 
                 . ' --out-interface ' . SERVER_INTERFACE
-                . ' --source ' . $userAddress . '/32'
+                . ' --source ' . $this->userAddress . '/32'
                 . ' --destination ' . $destination->ip . '/' . $destination->netmask;
 
             if ($destination->protocol) {
@@ -64,6 +51,14 @@ class IptablesManager {
             $stmt .= ' --jump MASQUERADE';
             exec($stmt);
         }
+    }
+
+    public function getPostroutingString() {
+        return " POSTROUTING --source $this->userAddress/32 --jump $this->userAddress";
+    }
+
+    public function getUserComment() {
+        return " --match comment --comment \"$this->user at $this->userAddress\"";
     }
 
 }
