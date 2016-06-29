@@ -28,3 +28,4 @@ if [[ -z "${SUDO}" || "${SUDO}" = ""  ]]; then echo "ERROR: SUDO NOT FOUND" && e
 
 ## Black magic
 ${SUDO} -E ${PHPCLI} $(pwd)/openvpn-php-access/openvpn.php ${USERTEMPFILE} connect ${username} ${ifconfig_pool_remote_ip} ${proto_1} ${dev}
+

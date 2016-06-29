@@ -3,7 +3,7 @@ require_once(__DIR__ . '/../config.php');
 
 class IptablesManager {
 
-    private $insertIndex = 3;
+    private $insertIndex = 1;
     protected $user;
     protected $userAddress;
 
@@ -29,11 +29,6 @@ class IptablesManager {
         exec('sudo iptables --table nat --new-chain ' . $this->userAddress);
         exec('sudo iptables --table nat --append ' . $this->getPostroutingString());
 
-        // Additional default rules for user's chain
-        exec("sudo iptables --table nat --append " . $this->userAddress . " --match conntrack --ctstate ESTABLISHED --jump ACCEPT" . $this->getUserComment());
-        exec("sudo iptables --table nat --append " . $this->userAddress . " --jump LOG --log-prefix \"DROP $this->user\"" . $this->getUserComment());
-        exec("sudo iptables --table nat --append " . $this->userAddress . " --jump DROP" . $this->getUserComment());
-
         // Could be missing protocol and dport if a general rule
         // Add rule in POSTROUTING to use individual chain
         foreach ($accessibleAddresses as $destination) {
@@ -55,10 +50,6 @@ class IptablesManager {
 
     public function getPostroutingString() {
         return " POSTROUTING --source $this->userAddress/32 --jump $this->userAddress";
-    }
-
-    public function getUserComment() {
-        return " --match comment --comment \"$this->user at $this->userAddress\"";
     }
 
 }
