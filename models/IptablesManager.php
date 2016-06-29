@@ -3,7 +3,7 @@ require_once(__DIR__ . '/../config.php');
 
 class IptablesManager {
 
-    private $insertIndex = 1;
+    private $insertIndex = 3;
     protected $user;
     protected $userAddress;
 
@@ -30,9 +30,9 @@ class IptablesManager {
         exec('sudo iptables --table nat --append ' . $this->getPostroutingString());
 
         // Additional default rules for user's chain
-        exec('sudo iptables --table nat --insert ' . $this->userAddress . "--match conntrack --ctstate ESTABLISHED --jump ACCEPT" . $this->getUserComment());
-        exec('sudo itables --table nat --append ' . $this->userAddress . '--jump LOG --log-prefix DROP ' . $this->userAddress . $this->getUserComment());
-        exec('iptables --table nat --append ' . $this->userAddress . ' --jump DROP' . $this->getUserComment());
+        exec("sudo iptables --table nat --append " . $this->userAddress . " --match conntrack --ctstate ESTABLISHED --jump ACCEPT" . $this->getUserComment());
+        exec("sudo iptables --table nat --append " . $this->userAddress . " --jump LOG --log-prefix \"DROP $this->user\"" . $this->getUserComment());
+        exec("sudo iptables --table nat --append " . $this->userAddress . " --jump DROP" . $this->getUserComment());
 
         // Could be missing protocol and dport if a general rule
         // Add rule in POSTROUTING to use individual chain
