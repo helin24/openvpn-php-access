@@ -13,7 +13,7 @@ class ConnectionManager {
         $this->user = $user;
         $this->userIP = $userIP;
         $this->inInterface = $inInterface;
-        $this->iptables = new IptablesManager($user, $userIP);
+        $this->iptables = new IptablesManager($user, $userIP, $inInterface);
     }
 
     public function connect() {
