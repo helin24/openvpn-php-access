@@ -25,7 +25,7 @@ class ConnectionManager {
         $this->iptables->createRules($rules);
 
         // Pass rules object to routes file generator
-        $routesWriter = new RoutesWriter($file);
+        $routesWriter = new RoutesWriter($this->file);
         $routesWriter->writeToFile($rules);
     }
 
