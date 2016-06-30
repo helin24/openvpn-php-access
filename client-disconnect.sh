@@ -29,4 +29,4 @@ if [[ -z "${SUDO}" || "${SUDO}" = ""  ]]; then echo "ERROR: SUDO NOT FOUND" && e
 ## Black magic
 printenv >> test-log.txt
 echo "Disconnect script" >> test-log.txt
-${SUDO} --preserve-env ${PHPCLI} $(pwd)/openvpn-php-access/openvpn.php disconnect ${username} ${ifconfig_pool_remote_ip}
+${SUDO} --preserve-env ${PHPCLI} $(pwd)/openvpn-php-access/openvpn.php disconnect

@@ -6,12 +6,10 @@ class IptablesManager {
     private $insertIndex = 1;
     protected $user;
     protected $userAddress;
-    protected $inInterface;
 
-    public function __construct($user, $userAddress, $inInterface) {
+    public function __construct($user, $userAddress) {
         $this->user = $user;
         $this->userAddress = $userAddress;
-        $this->inInterface = $inInterface;
     }
 
     public function deleteRules() {

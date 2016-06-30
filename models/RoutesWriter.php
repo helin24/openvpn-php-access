@@ -5,12 +5,11 @@ class RoutesWriter {
     protected $filename;
 
     public function __construct($filename) {
-	$this->filename = $filename;
+    	$this->filename = $filename;
     }
 
     public function writeToFile($accessibleAddresses) {
-        // open file
-	$file = fopen($this->filename, 'w');
+        $file = fopen($this->filename, 'w');
         
         foreach ($accessibleAddresses as $address) {
             $netmask = $address->getDecimalNetmask();
