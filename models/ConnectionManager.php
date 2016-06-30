@@ -8,7 +8,7 @@ class ConnectionManager {
     public $user;
     public $userIP;
 
-    public function __construct($user, $userIP, $inInterface, $file) {
+    public function __construct($user, $userIP, $inInterface = null, $file = null) {
         $this->user = $user;
         $this->userIP = $userIP;
         $this->iptables = new IptablesManager($user, $userIP, $inInterface);
