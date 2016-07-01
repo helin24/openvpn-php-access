@@ -141,6 +141,7 @@ class LDAP {
         }
         return $neatResults;
     }
+
     /**
      * Retrieves LDAP rules for groups with which the user is associated
      * @param  String $user LDAP username
@@ -156,16 +157,15 @@ class LDAP {
 
         foreach ($results as $result) {
             $access = False;
-            if ($members = $result["uniquemember"]) {
-                foreach ($members as $member) {
-                    if (mb_strpos($member, $userSearch) === 0) {
-                        $access = True;
-                        break;
-                    }
+
+            foreach ($result["uniquemember"] as $member) {
+                if (mb_strpos($member, $userSearch) === 0) {
+                    $access = True;
+                    break;
                 }
             }
 
-            if ($access && array_key_exists("accessto", $result)) {
+            if ($access) {
                 foreach ($result["accessto"] as $accessibleDN) {
                     $accessRules[$accessibleDN] = 1;
                 }
@@ -197,12 +197,11 @@ class LDAP {
         
         $user = $users[0];
         $results = [];
-        if (array_key_exists("accessto", $user)) {
-            foreach ($user["accessto"] as $accessibleDN) {
-                $results[$accessibleDN] = 1;
-            }
-            return $results;
+        foreach ($user["accessto"] as $accessibleDN) {
+            $results[$accessibleDN] = 1;
         }
+        
+        return $results;
     }
 
     /**
