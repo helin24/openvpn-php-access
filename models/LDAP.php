@@ -71,6 +71,48 @@ class LDAP {
         ];
     }
 
+    /**
+     * Removes unnecessary "count" attributes and transforms default array from ldap_search and ldap_get_entries into more common form. For example:
+      * [
+      *      0 => [
+      *           "count" => 3,
+      *           "objectClass" => [
+      *                "count" => 3,
+      *                0 => "groupOfUniqueNames",
+      *                1 => "top",
+      *                2 => "extensibleObject"
+      *                ],
+      *           0 => "objectClass",
+      *           "creatorsName" => [
+      *                "count" => 1,
+      *                0 => "cn=directory manager"
+      *                ],
+      *           1 => "creatorsName",
+      *           "dn" => "cn=usw2a-dns-01-live,ou=IPv4,ou=Networks,o=Vacasa,ou=Organizations,dc=vacasa,dc=com",
+      *           2 => "dn"
+      *     ]
+      * ]
+      * is transformed into:
+      * 
+      * [
+      *      0 => [
+      *           "objectClass" => [
+      *                0 => "groupOfUniqueNames",
+      *                1 => "top",
+      *                2 => "extensibleObject"
+      *                ],
+      *           "creatorsName" => [
+      *                0 => "cn=directory manager"
+      *                ],
+      *           "dn" => "cn=usw2a-dns-01-live,ou=IPv4,ou=Networks,o=Vacasa,ou=Organizations,dc=vacasa,dc=com",
+      *     ]
+      * ]
+     * 
+     * @param  String  $baseDN      Base DN for search
+     * @param  String  $filter      Filter string for search
+     * @param  boolean $singleLevel True for single-level search, false for search of entire subtree
+     * @return Array cleaned up array
+     */
     protected function searchLdap($baseDN, $filter, $singleLevel = false) {
         if ($singleLevel) {
             $search = ldap_list($this->connection, $baseDN, $filter);
