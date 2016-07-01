@@ -22,12 +22,10 @@ class IptablesManager {
     }
 
     public function createRules($accessibleAddresses) {
-        // first drop all user's rules
-        $this->deleteRules();
-
         // Create the user's chain
         exec('sudo iptables --table nat --new-chain ' . $this->userAddress);
         exec('sudo iptables --table nat --append ' . $this->getPostroutingString());
+
 
         // Could be missing protocol and dport if a general rule
         // Add rule in POSTROUTING to use individual chain
