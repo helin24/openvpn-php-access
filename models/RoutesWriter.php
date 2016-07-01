@@ -8,6 +8,11 @@ class RoutesWriter {
     	$this->filename = $filename;
     }
 
+    /**
+     * Write allowed routes to file (which pushes routes to client)
+     * @param  Object[] $accessibleAddresses Array of Address objects that client is allowed to access
+     * @return Boolean True if file closure is successful, false otherwise
+     */
     public function writeToFile($accessibleAddresses) {
         $file = fopen($this->filename, 'w');
         
@@ -17,5 +22,13 @@ class RoutesWriter {
         }
 
         return fclose($file);
+    }
+
+    /**
+     * Writes 'disable' to a file (which causes client to disconnect)
+     * @return Int|Boolean Number of bytes if write is successful, false otherwise
+     */
+    public function writeDisable() {
+        return file_put_contents($this->filename, "disable");
     }
 }

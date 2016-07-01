@@ -12,6 +12,10 @@ class IptablesManager {
         $this->userAddress = $userAddress;
     }
 
+    /**
+     * Deletes iptables rules associated with the user
+     * @return none
+     */
     public function deleteRules() {
         // drop user's rules from POSTROUTING
         exec('sudo iptables --table nat -D' . $this->getPostroutingString($this->userAddress));
@@ -21,6 +25,11 @@ class IptablesManager {
         exec('sudo iptables --table nat --delete-chain ' . $this->userAddress);
     }
 
+    /**
+     * Writes new rules to iptables permitting user to access allowed addresses
+     * @param  Object $accessibleAddresses Array of Address objects
+     * @return none
+     */
     public function createRules($accessibleAddresses) {
         // Create the user's chain
         exec('sudo iptables --table nat --new-chain ' . $this->userAddress);
@@ -46,6 +55,10 @@ class IptablesManager {
         }
     }
 
+    /**
+     * Returns the last part of iptables rules that refer to a user's chain from the POSTROUTING chain
+     * @return String
+     */
     public function getPostroutingString() {
         return " POSTROUTING --source $this->userAddress/32 --jump $this->userAddress";
     }

@@ -71,6 +71,11 @@ class LDAP {
         ];
     }
 
+    /**
+     * Retrieves LDAP rules for groups with which the user is associated
+     * @param  String $user LDAP username
+     * @return String[] Array of resource DNs user is permitted to access
+     */
     protected function getGroupRules($user) {
         $this->connect();
         $userSearch = $this->cr["filterIndividual"] . $user;
@@ -103,6 +108,11 @@ class LDAP {
         return $accessRules;        
     }
 
+    /**
+     * Retrieves LDAP rules associated with the user individually
+     * @param  String $user LDAP username
+     * @return String[] Array of resource DNs user is permitted to access
+     */
     protected function getIndividualRules($user) {
         $this->connect();
 
@@ -123,6 +133,11 @@ class LDAP {
         return $accessRules;
     }
 
+    /**
+     * Consolidate accessible resources into Address objects
+     * @param  String[] $rulesArray Array of resource DNs
+     * @return Object[] Array of Address objects
+     */
     protected function consolidateRules($rulesArray) {
         $addresses = [];
         foreach ($rulesArray as $ruleDN => $v) {
@@ -132,6 +147,11 @@ class LDAP {
         return $addresses;
     }
 
+    /**
+     * Retrieves detailed information about a resource from LDAP and saves information in Address object
+     * @param  String $ruleDN Resource DN
+     * @return Object Address object
+     */
     protected function getNetwork($ruleDN) {
         $this->connect();
 

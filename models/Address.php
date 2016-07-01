@@ -12,6 +12,10 @@ class Address  {
         $this->dn = $dn;
     }
     
+    /**
+     * Translates netmask to dotted decimal notation 
+     * @return String
+     */
     public function getDecimalNetMask() {
         $converter = [
             "0" => "0.0.0.0",

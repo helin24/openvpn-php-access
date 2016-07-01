@@ -15,9 +15,7 @@ if ($action == 'connect') {
         $connectionManager->connect();
     }
     catch (\Exception $ex) {
-        echo($ex->getMessage());
-        echo($ex->getTraceAsString());
-        file_put_contents($tempfile, "disable");
+        $connectionManager->forceDisconnect($ex);
     }
 } 
 elseif ($action == 'disconnect') {
