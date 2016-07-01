@@ -71,6 +71,34 @@ class LDAP {
         ];
     }
 
+    protected function searchLdap($baseDN, $filter, $singleLevel = false) {
+        if ($singleLevel) {
+            $search = ldap_list($this->connection, $baseDN, $filter);
+        }
+        else {
+            $search = ldap_search($this->connection, $baseDN, $filter);
+        }
+        $results = ldap_get_entries($this->connection, $search);
+
+        $neatResults = [];
+        foreach ($results as $resultKey => $result) {
+            if ($resultKey !== "count") {
+                $neatResults[$resultKey] = [];
+                $neatResults[$resultKey]["dn"] = $result["dn"];
+                foreach ($result as $attrName => $attrValue) {
+                    if (!is_numeric($attrName) && $attrName !== "count" && $attrName !== "dn") {
+                        $neatResults[$resultKey][$attrName] = [];
+                        foreach ($attrValue as $detailKey => $detail) {
+                            if ($detailKey !== "count") {
+                                $neatResults[$resultKey][$attrName][] = $detail;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $neatResults;
+    }
     /**
      * Retrieves LDAP rules for groups with which the user is associated
      * @param  String $user LDAP username
@@ -80,14 +108,13 @@ class LDAP {
         $this->connect();
         $userSearch = $this->cr["filterIndividual"] . $user;
 
-        $results = ldap_search($this->connection, $this->cr["baseDNGroup"], $this->cr["filterGroup"]);
+        $results = $this->searchLdap($this->cr["baseDNGroup"], $this->cr["filterGroup"]);
 
         $accessRules = [];
-        $nextEntry = ldap_first_entry($this->connection, $results);
-        do {
-            $attributes = ldap_get_attributes($this->connection, $nextEntry);
+
+        foreach ($results as $result) {
             $access = False;
-            if ($members = $attributes["uniqueMember"]) {
+            if ($members = $result["uniquemember"]) {
                 foreach ($members as $member) {
                     if (mb_strpos($member, $userSearch) === 0) {
                         $access = True;
@@ -96,16 +123,15 @@ class LDAP {
                 }
             }
 
-            if ($access) {
-                foreach ($attributes["accessTo"] as $key => $accessPoint) {
-                    if ($key !== "count") {
-                        $accessRules[$accessPoint] = 1;
-                    }
+            if ($access && array_key_exists("accessto", $result)) {
+                foreach ($result["accessto"] as $accessibleDN) {
+                    $accessRules[$accessibleDN] = 1;
                 }
             }
-        } while ($nextEntry = ldap_next_entry($this->connection, $nextEntry));
+
+        } 
         
-        return $accessRules;        
+        return $accessRules;
     }
 
     /**
@@ -116,21 +142,25 @@ class LDAP {
     protected function getIndividualRules($user) {
         $this->connect();
 
-        $resultResource = ldap_search($this->connection, $this->cr["baseDNIndividual"], $this->cr["filterIndividual"] . $user);
-        $result = ldap_get_entries($this->connection, $resultResource);
+        $users = $this->searchLdap($this->cr["baseDNIndividual"], $this->cr["filterIndividual"] . $user);
 
         $accessRules = [];
-    // If $result["count"] is 0, it means no users were returned.
-    // If accessto does not exist as a key, it means the user does not have individual rules
-        if ($result["count"] && array_key_exists("accessto", $result[0])) {
-            foreach ($result[0]["accessto"] as $key => $accessPoint) {
-                if ($key !== "count") {
-                    $accessRules[$accessPoint] = 1;
-                }
-            }
-        }
 
-        return $accessRules;
+        if (count($users) === 0) {
+            throw new \Exception("$user could not be found on LDAP");
+        }
+        else if (count($users) > 1) {
+            throw new \Exception("$user found multiple times on LDAP");
+        }
+        
+        $user = $users[0];
+        $results = [];
+        if (array_key_exists("accessto", $user)) {
+            foreach ($user["accessto"] as $accessibleDN) {
+                $results[$accessibleDN] = 1;
+            }
+            return $results;
+        }
     }
 
     /**
@@ -157,22 +187,16 @@ class LDAP {
 
         list($filter, $base) = explode(',', $ruleDN, 2);
 
-        $ipResource = ldap_list($this->connection, $base, $filter, ["ipnetworknumber", "ipnetmasknumber"]);
-        $ipResults = ldap_get_entries($this->connection, $ipResource);
+        $ipResults = $this->searchLdap($base, $filter, true);
 
         $ip = $ipResults[0]["ipnetworknumber"][0];
         $netmask = $ipResults[0]["ipnetmasknumber"][0];
 
-        $protocolResource = ldap_list($this->connection, $ruleDN, "cn=*", ["ipserviceport", "ipserviceprotocol"], 0);
-        $protocolResults = ldap_get_entries($this->connection, $protocolResource);
+        $protocolResults = $this->searchLdap($ruleDN, "cn=*", true);
 
         $addresses = [];
-        if ($protocolResults["count"] > 0) {
-            foreach ($protocolResults as $key => $result) {
-                if ($key === "count") {
-                    continue;
-                }
-
+        if (count($protocolResults) > 0) {
+            foreach ($protocolResults as $result) {
                 $address = new Address($ruleDN);
                 $address->ip = $ip;
                 $address->netmask = $netmask;
