@@ -60,7 +60,7 @@ class IptablesManager {
      * @return String
      */
     public function getPostroutingString() {
-        return " POSTROUTING --source $this->userAddress/32 --jump $this->userAddress";
+        return " POSTROUTING --source $this->userAddress/32 --jump $this->userAddress -m comment --comment $this->user";
     }
 
 }
