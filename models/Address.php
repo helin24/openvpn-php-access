@@ -8,8 +8,10 @@ class Address  {
     public $port;
     public $protocol;
 
-    public function __construct($dn) {
+    public function __construct($dn, $ip, $netmask) {
         $this->dn = $dn;
+        $this->ip = $ip;
+        $this->netmask = $netmask;
     }
     
     /**
@@ -52,5 +54,47 @@ class Address  {
             "31" => "255.255.255.254",
             "32" => "255.255.255.255"];
         return $converter[$this->netmask];
+    }
+
+    public static function create($dn, $ipNetworkNumber, $netmask, $port = null, $protocol = null) {
+        $actualIps = self::getUsableIps($ipNetworkNumber);
+
+        $addresses = [];
+
+        foreach ($actualIps as $ip) {
+            $address = new Address($dn, $ip, $netmask);
+
+            if ($port) {
+                $address->port = $port;
+            }
+
+            if ($protocol) {
+                $address->protocol = $protocol;
+            }
+
+            $addresses[] = $address;
+        }
+
+        return $addresses;
+    }
+
+    public function getUsableIps($ip) {
+
+        $ipv4Matcher = "#^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$#";
+        $ipv6Matcher = "#^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$#";
+
+        if (preg_match($ipv4Matcher, $ip)) {
+            return [$ip];
+        }
+        else if (preg_match($ipv6Matcher, $ip)) {
+            return [$ip];
+        }
+        else {
+            $results = dns_get_record($ip, DNS_A);
+            foreach ($results as $result) {
+                $ips[] = $result["ip"];
+            }
+            return $ips;
+        }
     }
 }

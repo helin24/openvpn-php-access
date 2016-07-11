@@ -238,21 +238,13 @@ class LDAP {
         $addresses = [];
         if (count($protocolResults) > 0) {
             foreach ($protocolResults as $result) {
-                $address = new Address($ruleDN);
-                $address->ip = $ip;
-                $address->netmask = $netmask;
-                $address->protocol = $result["ipserviceprotocol"][0];
-                $address->port = $result["ipserviceport"][0];
-
-                $addresses[] = $address;
+                $createdAddresses = Address::create($ruleDN, $ip, $netmask, $result["ipserviceport"][0], $result["ipserviceprotocol"][0]);
+                $addresses = array_merge($addresses, $createdAddresses);
             }
         }
         else {
-            $address = new Address($ruleDN);
-            $address->ip = $ip;
-            $address->netmask = $netmask;
-
-            $addresses[] = $address;
+            $createdAddresses = Address::create($ruleDN, $ip, $netmask);
+            $addresses = array_merge($addresses, $createdAddresses);
         }
 
         return $addresses;
