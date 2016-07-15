@@ -27,6 +27,11 @@ class ConnectionManager {
         // Get rules from LDAP
         $rules = LDAP::obtain()->getUserRules($this->user);
 
+        print("Rules found for user:\n");
+        foreach ($rules as $rule) {
+            print($rule->display() . "\n");
+        }
+
         // Pass rules object to iptables
         $this->iptables->createRules($rules);
 

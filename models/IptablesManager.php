@@ -45,13 +45,19 @@ class IptablesManager {
                 . ' --source ' . $this->userAddress . '/32'
                 . ' --destination ' . $destination->ip . '/' . $destination->netmask;
 
+            $logStmt = "Granting access for $this->user to $destination->ip/$destination->netmask";
+
             if ($destination->protocol) {
                 $stmt .= ' --protocol ' . $destination->protocol
                 . ' --destination-port ' . $destination->port;
+
+                $logStmt .= " on $destination->protocol/$destination->port";
             }
 
             $stmt .= ' --jump MASQUERADE';
             exec($stmt);
+
+            print($logStmt . "\n");
         }
     }
 

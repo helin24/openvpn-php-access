@@ -56,6 +56,28 @@ class Address  {
         return $converter[$this->netmask];
     }
 
+    /**
+     * Creates string to display all information about this address
+     * @return String
+     */
+    public function display() {
+        $str = "$this->ip/$this->netmask";
+        if ($this->protocol) {
+            $str .= " on $this->protocol/$this->port";
+        }
+        $str .= " ($this->dn)";
+        return $str;
+    }
+
+    /**
+     * Creates one or multiple address objects depending on whether IPs need to be resolved
+     * @param  String $dn Distinct name identifier
+     * @param  String $ipNetworkNumber
+     * @param  String $netmask
+     * @param  String $port
+     * @param  String $protocol
+     * @return Address[]
+     */
     public static function create($dn, $ipNetworkNumber, $netmask, $port = null, $protocol = null) {
         $actualIps = self::getUsableIps($ipNetworkNumber);
 
@@ -78,6 +100,11 @@ class Address  {
         return $addresses;
     }
 
+    /**
+     * Checks whether to resolve IP using DNS and returns all applicable IPs
+     * @param  String $ip
+     * @return String[]
+     */
     public function getUsableIps($ip) {
 
         $ipv4Matcher = "#^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$#";
