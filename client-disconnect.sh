@@ -16,7 +16,6 @@
 #======================================================================================================================
 
 ## Parameters
-echo "Starting disconnect" >> test-log.txt
 
 PHPCLI=$(which php)
 SUDO=$(which sudo)
@@ -27,6 +26,5 @@ if [[ -z "${PHPCLI}" || "${PHPCLI}" = "" ]]; then echo "ERROR: PHP NOT INSTALLED
 if [[ -z "${SUDO}" || "${SUDO}" = ""  ]]; then echo "ERROR: SUDO NOT FOUND" && exit 1 ; fi
 
 ## Black magic
-printenv >> test-log.txt
-echo "Disconnect script" >> test-log.txt
+
 ${SUDO} --preserve-env ${PHPCLI} $(pwd)/openvpn-php-access/openvpn.php disconnect

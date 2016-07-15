@@ -197,8 +197,10 @@ class LDAP {
         
         $user = $users[0];
         $results = [];
-        foreach ($user["accessto"] as $accessibleDN) {
-            $results[$accessibleDN] = 1;
+        if (array_key_exists("accessto", $user)) {
+            foreach ($user["accessto"] as $accessibleDN) {
+                $results[$accessibleDN] = 1;
+            }
         }
         
         return $results;

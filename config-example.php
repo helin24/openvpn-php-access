@@ -1,22 +1,28 @@
 <?php
 
-// LDAP Connection
-define("LDAP_ADDRESS", "ldap address");
-define("LDAP_PORT", 12345);
-define("LDAP_BIND", "Binding DN");
-define("LDAP_BIND_PASSWORD", "Binding password");
+/*
+Copy this example file to a new file called 'config.php'
+and replace with your own parameters
+*/
 
-// LDAP Group
-define("LDAP_BASE_GROUP", "Group DN");
-define("LDAP_FILTER_GROUP", "Filter criteria for groups");
+/* LDAP connection parameters */
+define("LDAP_ADDRESS", "ldap://exampleldap.company.com/");
+define("LDAP_PORT", 389);
+define("LDAP_BIND", "uid=somebinduser,dc=company,dc=com");
+define("LDAP_BIND_PASSWORD", "somebindpassword");
 
-// LDAP Individual
-define("LDAP_BASE_INDIVIDUAL", "DN for individuals");
-define("LDAP_FILTER_INDIVIDUAL", "Filter criteria for individuals");
+/* LDAP group DN */
+/* LDAP_BASE_GROUP should be groupOfUniqueNames in LDAP */
+define("LDAP_BASE_GROUP", "ou=Groups,dc=company,dc=com");
+define("LDAP_FILTER_GROUP", "cn=*");
 
-// iptables
-define("SERVER_INTERFACE", "interface");
+/* LDAP users */
+define("LDAP_BASE_INDIVIDUAL", "ou=Users,dc=company,dc=com");
+define("LDAP_FILTER_INDIVIDUAL", "uid=");
 
-// OpenVPN management interface
-define("SERVER_MGMT_ADDRESS", "address for OpenVPN management interface");
-define("SERVER_MGMT_PORT", "port");
+/* Server interface for outgoing connections (used by iptables) */
+define("SERVER_INTERFACE", "eth0");
+
+/* OpenVPN management interface */
+define("SERVER_MGMT_ADDRESS", "127.0.0.1");
+define("SERVER_MGMT_PORT", "1337");

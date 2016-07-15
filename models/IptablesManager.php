@@ -45,13 +45,26 @@ class IptablesManager {
                 . ' --source ' . $this->userAddress . '/32'
                 . ' --destination ' . $destination->ip . '/' . $destination->netmask;
 
+            $logStmt = "Granting access for $this->user to $destination->ip/$destination->netmask";
+
             if ($destination->protocol) {
                 $stmt .= ' --protocol ' . $destination->protocol
                 . ' --destination-port ' . $destination->port;
+
+                $logStmt .= " on $destination->protocol/$destination->port";
             }
 
             $stmt .= ' --jump MASQUERADE';
-            exec($stmt);
+            exec($stmt, $output, $returnVar);
+
+            if ($returnVar === 0) {
+                $logStmt .= " SUCCESS";
+            }
+            else {
+                $logStmt .= " FAILURE";
+            }
+
+            print($logStmt . "\n");
         }
     }
 
@@ -60,7 +73,7 @@ class IptablesManager {
      * @return String
      */
     public function getPostroutingString() {
-        return " POSTROUTING --source $this->userAddress/32 --jump $this->userAddress";
+        return " POSTROUTING --source $this->userAddress/32 --jump $this->userAddress -m comment --comment $this->user";
     }
 
 }
