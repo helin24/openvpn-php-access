@@ -55,7 +55,14 @@ class IptablesManager {
             }
 
             $stmt .= ' --jump MASQUERADE';
-            exec($stmt);
+            exec($stmt, $output, $returnVar);
+
+            if ($returnVar === 0) {
+                $logStmt .= " SUCCESS";
+            }
+            else {
+                $logStmt .= " FAILURE";
+            }
 
             print($logStmt . "\n");
         }
