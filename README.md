@@ -69,3 +69,6 @@ The script follows the following logic when the user initiates a disconnect:
 See the following wiki articles for more detailed information on the LDAP and OpenVPN setup:
 
 - [LDAP Structure](https://github.com/helin24/openvpn-php-access/wiki/LDAP-Structure "LDAP Structure")
+- [Example OpenVPN Client Config](https://github.com/helin24/openvpn-php-access/wiki/Example-OpenVPN-Client-Config "Example OpenVPN Client Config")
+- [Example OpenVPN Server Config](https://github.com/helin24/openvpn-php-access/wiki/Example-OpenVPN-Server-Config "Example OpenVPN Server Config")
+- [Example OpenVPN LDAP Module Config](https://github.com/helin24/openvpn-php-access/wiki/Example-OpenVPN-LDAP-Module-Config "Example OpenVPN LDAP Module Config")
