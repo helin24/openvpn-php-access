@@ -30,6 +30,7 @@ A set of PHP scripts to use for OpenVPN authorization with an LDAP backend. The 
  4. Install the following PHP dependencies:
 
     sudo apt-add-repository ppa:ondrej/php
+    sudo apt-get -y update
     sudo apt-get install php5.6-cli php5.6-ldap php5.6-mbstring
 
 ## Script Logic
