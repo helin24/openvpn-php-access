@@ -7,7 +7,7 @@ A set of PHP scripts to use for OpenVPN authorization with an LDAP backend. The 
  - Client-side implementation of access rules via `client-connect` script, where routes are pushed dynamically; no need for static definitions in CCD config directory
  - IPv4 routing through the OpenVPN server using `MASQUERADE` rules
  - No need to route everything through OpenVPN since dynamic routes are pushed to user based on their access rules
- - Resolution of DNS names, if needed, by placing FQDNs is `ipNetworkNumber` in LDAP.
+ - Resolution of DNS names, if needed, by placing FQDNs in `ipNetworkNumber` in LDAP.
 
 ## Installation
 
