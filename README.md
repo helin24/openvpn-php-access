@@ -27,6 +27,11 @@ A set of PHP scripts to use for OpenVPN authorization with an LDAP backend. The 
     client-disconnect /etc/openvpn/openvpn-php-access/client-disconnect.sh
     management 127.0.0.1 <random-port>
 
+ 4. Install the following PHP dependencies:
+
+    sudo apt-add-repository ppa:ondrej/php
+    sudo apt-get install php5.6-cli php5.6-ldap php5.6-mbstring
+
 ## Script Logic
 
 ### Connection
