@@ -13,25 +13,33 @@ A set of PHP scripts to use for OpenVPN authorization with an LDAP backend. The 
 
  1. Place the `openvpn-php-access` folder in your OpenVPN folder.
 
-    cd /etc/openvpn
-    git clone https://github.com/helin24/openvpn-php-access.git
+```
+cd /etc/openvpn
+git clone https://github.com/helin24/openvpn-php-access.git
+```
 
  2. Copy the `config-example.php` file to `config.php`. Make changes to `config.php` as needed for your setup.
 
-    cd openvpn-php-access/
-    cp config-example.php config.php
+```
+cd openvpn-php-access/
+cp config-example.php config.php
+```
 
  3. Add the following line to your OpenVPN configuration file:
 
-    client-connect /etc/openvpn/openvpn-php-access/client-connect.sh
-    client-disconnect /etc/openvpn/openvpn-php-access/client-disconnect.sh
-    management 127.0.0.1 <random-port>
+```
+client-connect /etc/openvpn/openvpn-php-access/client-connect.sh
+client-disconnect /etc/openvpn/openvpn-php-access/client-disconnect.sh
+management 127.0.0.1 <random-port>
+```
 
  4. Install the following PHP dependencies:
 
-    sudo apt-add-repository ppa:ondrej/php
-    sudo apt-get -y update
-    sudo apt-get install php5.6-cli php5.6-ldap php5.6-mbstring
+```
+sudo apt-add-repository ppa:ondrej/php
+sudo apt-get -y update
+sudo apt-get install php5.6-cli php5.6-ldap php5.6-mbstring
+```
 
 ## Script Logic
 
