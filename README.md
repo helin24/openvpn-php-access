@@ -72,3 +72,4 @@ See the following wiki articles for more detailed information on the LDAP and Op
 - [Example OpenVPN Client Config](https://github.com/helin24/openvpn-php-access/wiki/Example-OpenVPN-Client-Config "Example OpenVPN Client Config")
 - [Example OpenVPN Server Config](https://github.com/helin24/openvpn-php-access/wiki/Example-OpenVPN-Server-Config "Example OpenVPN Server Config")
 - [Example OpenVPN LDAP Module Config](https://github.com/helin24/openvpn-php-access/wiki/Example-OpenVPN-LDAP-Module-Config "Example OpenVPN LDAP Module Config")
+- [Check User Permissions](https://github.com/helin24/openvpn-php-access/wiki/Check-User-Permissions "Check User Permissions")
